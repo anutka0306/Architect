@@ -22,6 +22,7 @@ class ProductRepository
         }
 
         $productList = [];
+
         foreach ($this->getDataFromSource(['id' => $ids]) as $item) {
             $productList[] = new Product(
                 $item['id'],
@@ -29,7 +30,10 @@ class ProductRepository
                 $item['price']
             );
         }
-
+        $productList_clone = [];
+        foreach ($productList as $productItem){
+            $productList_clone[] = clone $productItem;
+        }
         return $productList;
     }
 
@@ -46,6 +50,10 @@ class ProductRepository
                 $item['name'],
                 $item['price']
             );
+        }
+        $productList_clone = [];
+        foreach ($productList as $productItem){
+            $productList_clone[] = clone $productItem;
         }
 
         return $productList;
