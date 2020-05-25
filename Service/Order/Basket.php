@@ -19,38 +19,10 @@ use Service\User\SecurityInterface;
 use Service\User\Security;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Service\Builder\BasketBuilder;
+use Model\Repository\CheckoutProcess;
 
-class CheckoutProcess{
-    /**
-     * Проведение всех этапов заказа
-     * @param BasketBuilder $discount
-     * @param BasketBuilder $billing
-     * @param BasketBuilder $security
-     * @param BasketBuilder $communication
-     * @return void
-     */
-    public function checkoutProcess(
-        $discount,
-        $billing,
-        $security,
-        $communication
-    ): void {
-        $basket = new Basket;
-        $totalPrice = 0;
-        foreach ($basket->getProductsInfo() as $product) {
-            $totalPrice += $product->getPrice();
-        }
 
-        $discount = $discount->getDiscount();
-        $totalPrice = $totalPrice - $totalPrice / 100 * $discount;
 
-        $billing->pay($totalPrice);
-
-        $user = $security->getUser();
-        $communication->process($user, 'checkout_template');
-    }
-
-}
 
 class Basket
 {
@@ -75,16 +47,15 @@ class Basket
     /**
      * @param SessionInterface $session
      * @param BasketBuilder $builder
-     * @param CheckoutProcess $checkoutProcess
      */
-    public function __construct(SessionInterface $session, BasketBuilder $builder, CheckoutProcess $checkoutProcess)
+    public function __construct(SessionInterface $session, BasketBuilder $builder )
     {
         $this->session = $session;
         $this->billing = $builder->getBilling();
         $this->discount = $builder->getDiscount();
         $this->communication = $builder->getCommunication();
         $this->security=$builder->getSecurity();
-        $this->checkoutProcess = $checkoutProcess;
+
 
 
     }
@@ -141,28 +112,7 @@ class Basket
      * @throws BillingException
      * @throws CommunicationException
      */
-    public function checkout(BasketBuilder $builder): void
-    {
-       /* // Здесь должна быть некоторая логика выбора способа платежа
-        $billing = new Card();
 
-        // Здесь должна быть некоторая логика получения информации о скидке
-        // пользователя
-        $discount = new NullObject();
-
-        // Здесь должна быть некоторая логика получения способа уведомления
-        // пользователя о покупке
-        $communication = new Email();
-
-        $security = new Security($this->session);*/
-        $billing = $builder->setBilling($this->billing);
-        $discount = $builder->setDiscount($this->discount);
-        $communication = $builder->setCommunication($this->communication);
-        $security = $builder->setSecurity($this->security);
-
-
-        $this->checkoutProcess->checkoutProcess($discount, $billing, $security, $communication);
-    }
 
 
 
