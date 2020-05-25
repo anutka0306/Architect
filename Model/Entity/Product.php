@@ -34,7 +34,7 @@ class Product
     }
     public function __clone()
     {
-
+    /* Возможно какая-то логика клонирования */
     }
 
     /**
