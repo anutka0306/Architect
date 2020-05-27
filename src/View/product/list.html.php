@@ -1,6 +1,9 @@
 <?php
 
 use Model\Entity\Product;
+use Service\Product\ProductSorter;
+use Comparator\NameComparator;
+use Comparator\PriceComparator;
 
 /**
  * @var Closure $renderLayout 
@@ -41,3 +44,9 @@ $renderLayout(
         'body' => $body,
     ]
 );
+
+$nameSorter = new ProductSorter(new NameComparator());
+$priceSorter = new ProductSorter(new PriceComparator());
+
+$nameSorterArray = $nameSorter->sort($productList);
+$priceSorterArray = $priceSorter->sort($productList);
