@@ -15,9 +15,18 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
+use Command\RegisterConfigsCommand;
+use Contract\CommandInterface;
 
-class Kernel
+class Kernel implements CommandInterface
 {
+
+    /**
+     * @var RegisterConfigsCommand
+     */
+
+    private $command;
+
     /**
      * @var RouteCollection
      */
@@ -28,9 +37,16 @@ class Kernel
      */
     protected $containerBuilder;
 
-    public function __construct(ContainerBuilder $containerBuilder)
+    /**
+     * Kernel constructor.
+     * @param ContainerBuilder $containerBuilder
+     * @param RegisterConfigsCommand $command
+     */
+
+    public function __construct(ContainerBuilder $containerBuilder, RegisterConfigsCommand $command)
     {
         $this->containerBuilder = $containerBuilder;
+        $this->command = $command;
     }
 
     /**
@@ -39,25 +55,17 @@ class Kernel
      */
     public function handle(Request $request): Response
     {
-        $this->registerConfigs();
+
         $this->registerRoutes();
 
         return $this->process($request);
     }
 
-    /**
-     * @return void
-     */
-    protected function registerConfigs(): void
+    public function execute(): void
     {
-        try {
-            $fileLocator = new FileLocator(__DIR__ . DIRECTORY_SEPARATOR . 'config');
-            $loader = new PhpFileLoader($this->containerBuilder, $fileLocator);
-            $loader->load('parameters.php');
-        } catch (\Throwable $e) {
-            die('Cannot read the config file. File: ' . __FILE__ . '. Line: ' . __LINE__);
-        }
+        $this->command->registerConfigs();
     }
+
 
     /**
      * @return void
