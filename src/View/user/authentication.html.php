@@ -8,6 +8,8 @@ use Model\Entity\Product;
  * @var string $error
  * @var Closure $path
  */
+$controller = new Controller();
+$controller->action();
 
 $body = function () use ($path, $error) {
 ?>
